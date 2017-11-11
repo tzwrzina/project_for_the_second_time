@@ -1,0 +1,172 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include<cstring>
+#include<cstdlib>
+#include <cmath>
+# define K  1000  //goneis
+# define C  50   // paidia
+
+using namespace std;
+
+long long toString(string rec);
+string put;
+
+typedef struct trie_node{
+char word[50];
+char is_final[1];
+int num_child, seats;
+struct trie_node* children;
+}trie_node;
+
+
+class Index
+{
+    public:
+        trie_node *root;
+        int N, num_child, seats;
+    
+        Index(int key )
+        {   
+            root=malloc(sizeof(trie_node));
+            root->children=malloc(K*sizeof(trie_node)); 
+            root->num_child=0;                    
+            root->seats=K;
+            strcpy(root->is_final ,"N");
+            for (int i = 0; i < K; i++)
+            {  
+              //root->children[i].word=malloc(root->children[i].word);
+	     
+              root->children[i].seats=C;
+	      root->children[i].num_child=0;
+	      strcpy(root->children[i].is_final,"N");
+            }
+        };
+   
+        void add_child(trie_node *new_node, int i){
+             new_node->children=malloc(C*sizeof(trie_node)); 
+             for (int i = 0; i < C; i++)
+            {  
+         
+              new_node->children[i].seats=C;
+	      new_node->children[i].num_child=0;
+	      strcpy(new_node->children[i].is_final,"N");
+            }
+	
+	}
+  
+ int Insert_child(trie_node *new_node,string word_new) {                           //na tin sbiso
+       string str2 (" "), first,last;
+       size_t found=0;
+       int find=0,k,i;
+       found = word_new.find(str2);
+       first =word_new.substr (0,found).c_str();
+       
+       if (found > word_new.length()) found=0;
+ 			
+              if (found==0){		cout<<first<<endl;
+					add_child(new_node,3);
+					cout<< "edw einai to zoumi: "<<first.c_str() <<endl;
+					strcpy(new_node->children[new_node->num_child].is_final ,"Y");  
+					strcpy(new_node->children[new_node->num_child].word, first.c_str());
+					new_node->num_child++;
+					cout<<new_node->children[new_node->num_child].is_final<<endl;
+                                 	cout<<"hello0"<<endl;
+					    
+                                      
+				return -1; }  
+	        
+               else{                    add_child(new_node,3);
+					strcpy(new_node->children[new_node->num_child].is_final ,"N");  // den exei paidia 
+					strcpy(new_node->children[new_node->num_child].word, first.c_str());
+					last=word_new.substr (found+1).c_str();
+                                        Insert_child(&new_node->children[new_node->num_child],last);
+			                new_node->num_child++; 
+					cout<<"hello1"<<endl; 
+                			return 0;              
+		}
+                     //new_child(new_node->children[find], last);	                                    //bale eggonia                                                    // aujano toplithos
+         //   return -1 ; //} 
+    }
+  
+
+
+
+int diarein(trie_node *node, int start, int end, string word,int k){  // an yparxei epistrefei ti uesi diaforetika 0
+     int x=0,i; 
+     i=(end+start)/2; 
+     k++; 
+     if (k>log(node->num_child)+4) return -1;
+  //	if (strcmp(node->children[i].word, word.c_str() )== 0) { return i;}
+ // 	if (toString(node->children[i].word)>toString(word.c_str())) { 
+//	x= diarein( node, start,i, word,k); return x;} 
+//	else{ x= diarein( node, i ,end , word,k); return x;}
+	return x;
+  }
+  
+
+
+
+   int Insert_root(trie_node *new_node,string word_new) {                           //na tin sbiso
+       string str2 (" "), first,last;
+       size_t found=0;
+       int find=0,k,i;
+       found = word_new.find(str2);
+       first =word_new.substr (0,found).c_str();
+       cout<<"hello"<<endl;
+       if (found > word_new.length()) found=0;
+ 
+              if (found==0){strcpy(new_node->children[find].is_final ,"Y");  // den exei paidia 
+					strcpy(new_node->children[root->num_child].word, first.c_str());
+					root->num_child++;
+                                         
+				return -1; }  
+	        
+               else{                   strcpy(new_node->children[find].is_final ,"N");  // den exei paidia 
+					strcpy(new_node->children[root->num_child].word, first.c_str());
+					//trie_node temp=add_child(root->children[root->num_child],3);
+					last=word_new.substr (found+1).c_str();
+                                        cout<<"last"<<last<<endl;
+                                        Insert_child(&root->children[root->num_child],last);
+					
+			                root->num_child++;
+                			return 0;              
+		//}
+                     //new_child(new_node->children[find], last);	                                    //bale eggonia                                                    // aujano toplithos
+         //   return -1 ; //} 
+    }
+  
+
+}  
+int read_data(char *x){
+  	
+  string line;
+   ifstream myfile (x);
+
+  
+  if (myfile.is_open())
+  { int i=0;
+    while ( getline (myfile,line) )  { 
+	          Insert_root(root,line);
+	          
+	   	}  
+	for(int i=0; i<100; i++){
+        cout << i << " " << root->children[i].word << endl;
+        for(int j=0; j<root->children[i].num_child; j++){if(root->children[i].children!=NULL) cout<<"deutero paidi"<<root->children[i].children[j].word<<endl;}
+         }
+       
+        cout<<endl;   	
+	root->seats = root->num_child;
+   // sort(root);                  // taksinomisi eggrafon
+   // put_away(root);             // bazo "zzzzz"
+   // sort(root);                 //taksinomisi eggrafon
+   // deletez(root);             // delete "zzzzz"
+    myfile.close();
+ cout<<"num_child"<< root->num_child<<endl;  
+  
+
+return 0;
+}
+ else return 1;
+};
+};
